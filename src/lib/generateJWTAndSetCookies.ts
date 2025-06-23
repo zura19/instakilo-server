@@ -12,7 +12,7 @@ export function generateJWTAndSetCookies(userId: string, res: Response) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    domain: ".instakilo-client.vercel.app",
+    // domain: process.env.DOMAIN,
     path: "/",
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   });
