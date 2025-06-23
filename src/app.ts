@@ -5,7 +5,6 @@ import cookieParser from "cookie-parser";
 import http from "http";
 import { Server } from "socket.io";
 import cloudinary from "cloudinary";
-import { Request, Response } from "express";
 
 import authRouter from "./routes/authRoutes";
 import userRouter from "./routes/userRoutes";
@@ -26,6 +25,8 @@ app.use(
   cors({
     origin: process.env.CLIENT_URL!,
     credentials: true,
+    // methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    // allowedHeaders: ["Content-Type", "Authorization", "credentials"],
   })
 );
 

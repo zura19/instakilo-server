@@ -80,6 +80,8 @@ export async function getPosts(req: Request, res: Response): Promise<any> {
   const user = req?.user;
   const { page = 0, limit = 10 } = req.query;
 
+  console.log("DOMAIN:" + process.env.DOMAIN);
+
   const skip = Number(page) * Number(limit);
   const take = Number(limit);
 
