@@ -14,8 +14,8 @@ export function generateJWTAndSetCookies(userId: string, res: Response) {
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     path: "/",
-    domain:
-      process.env.NODE_ENV === "production" ? process.env.DOMAIN : undefined,
+    // domain:
+    //   process.env.NODE_ENV === "production" ? process.env.DOMAIN : undefined,
   });
 
   return token;
