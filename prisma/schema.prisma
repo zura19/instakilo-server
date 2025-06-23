@@ -1,0 +1,171 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  password      String
+  image         String?
+  bio           String?
+  birthDay      DateTime
+  isVerificated Boolean  @default(false)
+
+  role   Role   @default(user)
+  gender Gender
+
+  posts  Post[]
+  tagged Post[] @relation("tagged")
+  likes  Post[] @relation("likes")
+  saved  Post[] @relation("bookmarks")
+
+  comments      Comment[]
+  LikedComments Comment[] @relation("commentLike")
+
+  followers Follow[] @relation("followings")
+  following Follow[] @relation("followers")
+
+  searchHistory SearchHistory?
+  searchedIn    SearchHistory[] @relation("searched")
+
+  Conversation1 Conversation[] @relation("conversation1")
+  Conversation2 Conversation[] @relation("conversation2")
+
+  sentMessages Message[]
+
+  receivedNoticiations Notification[] @relation("receivedNofications")
+  sentNotifications    Notification[] @relation("sentNotifications")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SearchHistory {
+  id                     String   @id @default(cuid())
+  searchedById           String   @unique
+  searchedBy             User     @relation(fields: [searchedById], references: [id], onDelete: Cascade)
+  searchedUsers          User[]   @relation("searched")
+  orderedSearchedUserIds String[]
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model Follow {
+  id          String @id @default(cuid())
+  followerId  String
+  followingId String
+
+  follower  User @relation("followers", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("followings", fields: [followingId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  user
+  admin
+}
+
+enum Gender {
+  male
+  female
+}
+
+model Post {
+  id       String   @id @default(cuid())
+  content  String
+  images   String[]
+  authorId String
+
+  author  User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  tags    User[] @relation("tagged")
+  likedBy User[] @relation("likes")
+  savedBy User[] @relation("bookmarks")
+
+  comments Comment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Comment {
+  id       String @id @default(cuid())
+  content  String
+  authorId String
+  postId   String
+
+  author User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  likes  User[] @relation("commentLike")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Conversation {
+  id            String   @id @default(cuid())
+  firstUserId   String
+  secondUserId  String
+  lastMessage   String
+  lastMessageAt DateTime
+
+  firstUser  User @relation("conversation1", fields: [firstUserId], references: [id], onDelete: Cascade)
+  secondUser User @relation("conversation2", fields: [secondUserId], references: [id], onDelete: Cascade)
+
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id             String  @id @default(cuid())
+  senderId       String
+  conversationId String
+  message        String
+  isRead         Boolean @default(false)
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id         String           @id @default(cuid())
+  receiverId String
+  senderId   String
+  message    String?
+  redirectTo String?
+  type       NotificationType
+  isRead     Boolean          @default(false)
+
+  receiver  User     @relation("receivedNofications", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender    User     @relation("sentNotifications", fields: [senderId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum NotificationType {
+  post
+  like
+  comment
+  likedComment
+  follow
+  message
+  tag
+}
