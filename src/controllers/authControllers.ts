@@ -127,16 +127,17 @@ export async function protect(
   next: NextFunction
 ): Promise<any> {
   try {
-    if (
-      req.headers.authorization &&
-      !req.headers.authorization.startsWith("Bearer")
-    ) {
-      return res
-        .status(401)
-        .json({ success: false, message: "User is not authenticated" });
+    let token;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
     }
 
-    const token = req.cookies?.jwt || req.headers.authorization?.split(" ")[1];
+    if (!token && req.cookies.jwt) {
+      token = req.cookies.jwt;
+    }
+
+    // const token = req.cookies?.jwt || req.headers.authorization?.split(" ")[1];
 
     if (!token) {
       return res
