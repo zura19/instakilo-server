@@ -9,10 +9,11 @@ export function generateJWTAndSetCookies(userId: string, res: Response) {
   });
   res.cookie("jwt", token, {
     httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    // secure: process.env.NODE_ENV === "production",
-    // sameSite: process.env.NODE_ENV === "production" ? 'none' : "lax",
+    // secure: true,
+    // sameSite: "none",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    domain: ".instakilo-client.vercel.app",
     path: "/",
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   });
