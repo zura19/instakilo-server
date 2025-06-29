@@ -161,3 +161,63 @@ export async function likeUnlikeComment(
     });
   }
 }
+
+export async function deleteComment(req: Request, res: Response): Promise<any> {
+  const { postId, commentId } = req.params;
+  const userId = req.user?.id;
+  try {
+    const comment = await prisma.comment.findUnique({
+      where: { id: commentId },
+      select: { authorId: true },
+    });
+    if (comment?.authorId !== userId) {
+      return res.status(404).json({
+        success: false,
+        message: "You don't have permission to delete this comment",
+      });
+    }
+
+    await prisma.comment.delete({ where: { id: commentId, postId } });
+    return res.status(200).json({ success: true, message: "Comment deleted" });
+  } catch (error: any) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error?.message || "Internal server error",
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function updateComment(req: Request, res: Response): Promise<any> {
+  const { postId, commentId } = req.params;
+  const { content } = req.body;
+  const userId = req.user?.id;
+  try {
+    const comment = await prisma.comment.findUnique({
+      where: { id: commentId },
+      select: { authorId: true },
+    });
+
+    if (comment?.authorId !== userId) {
+      return res.status(404).json({
+        success: false,
+        message: "You don't have permission to update this comment",
+      });
+    }
+
+    const updatedComment = await prisma.comment.update({
+      where: { id: commentId },
+      data: { content },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Comment updated successfully",
+    });
+  } catch (error) {
+  } finally {
+    await prisma.$disconnect();
+  }
+}

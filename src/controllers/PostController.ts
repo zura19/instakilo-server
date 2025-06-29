@@ -65,6 +65,7 @@ export async function getRandomPosts(
       },
       skip: 0,
       take: 10,
+      orderBy: { likedBy: { _count: "desc" } },
     });
     return res.status(200).json({ success: true, posts, nextPage: null });
   } catch (error: any) {
