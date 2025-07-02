@@ -48,6 +48,10 @@ model User {
   receivedNoticiations Notification[] @relation("receivedNofications")
   sentNotifications    Notification[] @relation("sentNotifications")
 
+  stories       Story[]
+  viewedStories Story[] @relation("viewedStory")
+  likedStories  Story[] @relation("likedStory")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -168,4 +172,17 @@ enum NotificationType {
   follow
   message
   tag
+}
+
+model Story {
+  id       String @id @default(cuid())
+  authorId String
+  image    String
+
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  viewedBy User[] @relation("viewedStory")
+  likedBy  User[] @relation("likedStory")
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
 }

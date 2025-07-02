@@ -12,6 +12,7 @@ import postRoutes from "./routes/postRoutes";
 import commentRoutes from "./routes/commentsRoutes";
 import messagesRoutes from "./routes/messagesRoutes";
 import notificationRoutes from "./routes/notificationsRoutes";
+import storyRouter from "./routes/storyRoutes";
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/messages", messagesRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/stories", storyRouter);
 
 const server = http.createServer(app);
 export const io = new Server(server, {

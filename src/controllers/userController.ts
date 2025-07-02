@@ -54,7 +54,9 @@ export async function getUser(req: Request, res: Response): Promise<any> {
          {
           followers: { select: { followerId: true } },
           following: { select: { followingId: true } },
+          stories:{where: { createdAt: { gt: new Date(Date.now() - 24 * 60 * 60 * 1000) }}, select: { id: true }
         },
+      },
     });
 
     if (!user)
@@ -66,9 +68,20 @@ export async function getUser(req: Request, res: Response): Promise<any> {
       where: { authorId: user.id },
     });
 
+    // const isStoryViewed = user.stories.every((s) =>
+    //   s.viewedBy.some((v) => v.id === "cmbjazzu600006s0v62fm3e8x")
+    // );
+
+    const u = {
+      ...user,
+      password: undefined,
+      hasStory: user.stories.length > 0,
+      // isStoryViewed,
+    };
+
     return res.status(200).json({
       success: true,
-      user: { ...user, password: undefined },
+      user: u,
       posts: countPosts,
     });
   } catch (error) {
