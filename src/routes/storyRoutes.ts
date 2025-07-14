@@ -4,6 +4,7 @@ import {
   addStory,
   deleteStory,
   getArchivedStories,
+  getArchivedStory,
   getStories,
   getStoryViewers,
   getUserStories,
@@ -16,6 +17,7 @@ const router = express.Router();
 router.route("/").get(protect, getStories).post(protect, addStory);
 
 router.route("/archive").get(protect, getArchivedStories);
+router.route("/archive/:id").get(protect, getArchivedStory);
 router.route("/:userId").get(protect, getUserStories);
 
 router.route("/story/:storyId").delete(protect, deleteStory);

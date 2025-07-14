@@ -302,11 +302,48 @@ export async function getArchivedStories(
         },
       },
       select: { id: true, image: true, createdAt: true },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     res.status(200).json({
       success: true,
       stories,
+    });
+  } catch (error: any) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error?.message || "Internal server error",
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function getArchivedStory(req: Request, res: Response) {
+  const userId = req.user?.id;
+  const { id } = req.params;
+  try {
+    const story = await prisma.story.findUnique({
+      where: {
+        id,
+        authorId: userId,
+        createdAt: {
+          lt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 24 hours ago
+        },
+      },
+      select: {
+        id: true,
+        image: true,
+        createdAt: true,
+        author: { select: { id: true, name: true, image: true } },
+      },
+    });
+    res.status(200).json({
+      success: true,
+      story,
     });
   } catch (error: any) {
     console.log(error);
